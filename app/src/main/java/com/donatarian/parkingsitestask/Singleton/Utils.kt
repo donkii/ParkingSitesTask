@@ -9,22 +9,6 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-//class Utils private constructor() {
-//
-//    companion object {
-//        //Debuggable field to check instance count
-//        var myInstancesCount = 0;
-//        private lateinit var mInstance: Utils
-//
-//        @Synchronized
-//        fun getInstance(): Utils {
-//            if(mInstance == null)
-//                mInstance = Utils()
-//            return mInstance
-//        }
-//    }
-//
-//}
 
 
 class Utils {
@@ -47,6 +31,14 @@ class Utils {
         return this.URL
     }
 
+    fun initializeList(list: List<ParkingSite>) {
+        parkingSiteList = list
+    }
+
+    fun getList(): List<ParkingSite> {
+        return parkingSiteList
+    }
+
     fun getDataFromAPI() {
         retrofitClientInterface = RetrofitCaller().createService()
         call = retrofitClientInterface.getParkingSites()
@@ -56,6 +48,7 @@ class Utils {
                                     response: Response<ParkingSiteEngine>?) {
                 if (response!!.isSuccessful) {
                     parkingSiteList = response.body()!!.parking_sites!!
+                    initializeList(parkingSiteList)
                 }
                 else {
                     Log.e("gadad", "blablabla")
@@ -67,14 +60,6 @@ class Utils {
             }
         })
     }
-
-
-
-
-
-
-
-
 
 
     // Creating the Singleton Instance
