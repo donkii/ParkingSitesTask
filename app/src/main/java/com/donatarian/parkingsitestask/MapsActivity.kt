@@ -23,21 +23,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         mapFragment.getMapAsync(this)
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
+
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        mMap.addMarker(MarkerOptions().position(LatLng(48.240514,16.436456 )).title("Marker in Sydney"))
+        mMap.addMarker(MarkerOptions().position(LatLng(47.2358948689,9.59410607815 )).title("Marker in Sydney"))
+        mMap.addMarker(MarkerOptions().position(LatLng(9.59663540125, 47.2386520491)).title("Marker in Sydney"))
+        mMap.addMarker(MarkerOptions().position(LatLng(9.59792822599, 47.2352356012)).title("Marker in Sydney"))
+        mMap.addMarker(MarkerOptions().position(LatLng(9.59797, 47.25577)).title("Marker in Sydney"))
+        mMap.addMarker(MarkerOptions().position(LatLng(9.602207, 47.239259)).title("Marker in Sydney"))
+        mMap.addMarker(MarkerOptions().position(LatLng(9.62073, 47.255551)).title("Marker in Sydney"))
+        mMap.addMarker(MarkerOptions().position(LatLng(9.624301, 47.309196)).title("Marker in Sydney"))
+        mMap.addMarker(MarkerOptions().position(LatLng(9.6352395, 47.2939685)).title("Marker in Sydney"))
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(47.25577, 9.59797 )))
     }
 }
