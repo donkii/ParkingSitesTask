@@ -9,4 +9,6 @@ class ParkingSiteEngine {
     @Expose
     var parkingSites: List<ParkingSite>? = null
 
+
+
 }

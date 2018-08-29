@@ -2,6 +2,7 @@ package com.donatarian.parkingsitestask
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import com.donatarian.parkingsitestask.Singleton.Utils
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -21,6 +22,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        Utils.getInstance()!!.getDataFromAPI()
     }
 
 
