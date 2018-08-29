@@ -16,7 +16,7 @@ class RetrofitCaller {
     private var okHttpClient = OkHttpClient()
     private var objectMapper = ObjectMapper()
     private var retrofit = Retrofit.Builder()
-            .baseUrl(Utils.getInstance()!!.getURL())
+            .baseUrl("http://192.168.0.121:88")
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()
