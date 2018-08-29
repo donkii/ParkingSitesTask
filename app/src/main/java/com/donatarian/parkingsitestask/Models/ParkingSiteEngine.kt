@@ -7,7 +7,7 @@ class ParkingSiteEngine {
 
     @SerializedName("parking_sites")
     @Expose
-    var parkingSites: List<ParkingSite>? = null
+    var parking_sites: List<ParkingSite>? = null
 
 
 

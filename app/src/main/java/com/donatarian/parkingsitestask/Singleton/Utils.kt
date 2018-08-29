@@ -55,7 +55,7 @@ class Utils {
             override fun onResponse(call: Call<ParkingSiteEngine>?,
                                     response: Response<ParkingSiteEngine>?) {
                 if (response!!.isSuccessful) {
-                    parkingSiteList = response.body()!!.parkingSites!!
+                    parkingSiteList = response.body()!!.parking_sites!!
                 }
                 else {
                     Log.e("gadad", "blablabla")
@@ -64,7 +64,6 @@ class Utils {
 
             override fun onFailure(call: Call<ParkingSiteEngine>?, t: Throwable?) {
                 Log.e("failed", "blablabla")
-
             }
         })
     }
