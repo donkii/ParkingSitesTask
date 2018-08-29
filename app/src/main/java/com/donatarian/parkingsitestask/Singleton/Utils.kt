@@ -64,6 +64,7 @@ class Utils {
 
             override fun onFailure(call: Call<ParkingSiteEngine>?, t: Throwable?) {
                 Log.e("failed", "blablabla")
+
             }
         })
     }
