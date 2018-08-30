@@ -30,9 +30,10 @@ class MainActivity : AppCompatActivity() {
         mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync {
             googleMap = it
+            val initialLocation = LatLng(48.210033, 16.363449)
             val location1 = LatLng(13.0356745,77.5881522)
             googleMap.addMarker(MarkerOptions().position(location1).title("My Location"))
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(location1,15f))
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(initialLocation, 10.5f))
 
             val location2 = LatLng(9.89,78.11)
             googleMap.addMarker(MarkerOptions().position(location2).title("Madurai"))
@@ -41,15 +42,13 @@ class MainActivity : AppCompatActivity() {
             val location3 = LatLng(13.029727,77.5933021)
             googleMap.addMarker(MarkerOptions().position(location3).title("Bangalore"))
 
-            val URL = getDirectionURL(location1,location3)
-            GetDirection(URL).execute()
+//            val URL = getDirectionURL(location1,location3)
+//            GetDirection(URL).execute()
 
         }
     }
 
-    fun getDirectionURL(origin:LatLng,dest:LatLng) : String{
-        return "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${dest.latitude},${dest.longitude}&sensor=false&mode=driving"
-    }
+
 
     private inner class GetDirection(val url : String) : AsyncTask<Void, Void, List<List<LatLng>>>(){
         override fun doInBackground(vararg params: Void?): List<List<LatLng>> {
