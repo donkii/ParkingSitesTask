@@ -1,10 +1,11 @@
 package com.donatarian.parkingsitestask
 
 import android.graphics.Color
+import android.location.Address
+import android.location.Geocoder
 import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.widget.Toast
 import com.donatarian.parkingsitestask.Models.ParkingSite
@@ -13,14 +14,15 @@ import com.donatarian.parkingsitestask.map.GoogleMapDTO
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
 import com.google.gson.Gson
+import kotlinx.android.synthetic.main.activity_maps.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.io.IOException
 import javax.inject.Inject
 
 class MapsActivity : AppCompatActivity(), ParkingContract.View {
@@ -28,17 +30,15 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
     @Inject
     lateinit var utils : Utils
 
-    private lateinit var parkingList: MutableList<ParkingSite>
-
-    private var parkingLocations: MutableList<LatLng> = mutableListOf()
-
-    lateinit var mapFragment : SupportMapFragment
     lateinit var googleMap: GoogleMap
+    lateinit var mapFragment : SupportMapFragment
 
     private lateinit var mMap: GoogleMap
     lateinit var parkingSitesList: List<ParkingSite>
     lateinit var presenter: ParkingContract.Presenter
     internal var markerPoints = ArrayList<LatLng>()
+    private lateinit var parkingList: MutableList<ParkingSite>
+    private var parkingLocations: MutableList<LatLng> = mutableListOf()
     lateinit var URL: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,29 +46,19 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
         setContentView(R.layout.activity_maps)
         App.appComponent.inject(this)
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync {
             googleMap = it
-            val initialLocation = LatLng(48.210033, 16.363449)
-            val location1 = LatLng(13.0356745,77.5881522)
-            googleMap.addMarker(MarkerOptions().position(location1).title("My Location"))
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(initialLocation, 10.5f))
-
-            val location2 = LatLng(9.89,78.11)
-            googleMap.addMarker(MarkerOptions().position(location2).title("Madurai"))
-
-
-            val location3 = LatLng(13.029727,77.5933021)
-            googleMap.addMarker(MarkerOptions().position(location3).title("Bangalore"))
-
-            val URL = presenter.getDirectionUrl(location1,location3)
-            presenter.executeTask(URL)
-
+        val initialLocation = LatLng(48.210033, 16.363449)
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(initialLocation, 10.5f))
         }
 
         presenter = ParkingPresenter(this)
         presenter.loadList()
+
+        btnSearch.setOnClickListener {
+            showRoute()
+        }
     }
 
     override fun getPolyline(lineoption: PolylineOptions) {
@@ -196,5 +186,49 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
             location = LatLng(parking.location?.latitude!!, parking.location?.longitude!!)
             googleMap.addMarker(MarkerOptions().position(location).title(parking.title))
         }
+    }
+
+    fun showRoute(){
+        val originLocation = getLocationFromAddress(txtDestination.text.toString())
+        val destinationLocation = getLocationFromAddress(txtOrigin.text.toString())
+
+        if (originLocation == LatLng(0.0, 0.0) || destinationLocation == LatLng(0.0, 0.0)){
+        }else {
+            googleMap.clear()
+            googleMap.addMarker(MarkerOptions().position(originLocation).title(txtDestination.text.toString()))
+            googleMap.addMarker(MarkerOptions().position(destinationLocation).title(txtOrigin.text.toString()))
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(originLocation, 12f))
+
+            val URL = presenter.getDirectionUrl(originLocation, destinationLocation)
+            presenter.executeTask(URL)
+        }
+    }
+
+    fun getLocationFromAddress(strAddress: String): LatLng {
+
+        var point = LatLng(0.0, 0.0)
+        if (strAddress.trim { it <= ' ' } != "") {
+            val coder = Geocoder(applicationContext)
+            val address: List<Address>
+
+
+            try {
+                // May throw an IOException
+                address = coder.getFromLocationName(strAddress, 5)
+                if (address.isEmpty()) {
+                    return point
+                }
+                val location = address[0]
+                location.latitude
+                location.longitude
+
+                point = LatLng(location.latitude, location.longitude)
+
+            } catch (ex: IOException) {
+                ex.printStackTrace()
+            }
+
+        }
+        return point
     }
 }
