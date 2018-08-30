@@ -19,9 +19,15 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ParkingContract.Vi
 
     @Inject
     lateinit var utils : Utils
+
+    private lateinit var parkingList: MutableList<ParkingSite>
+
+    private var parkingLocations: MutableList<LatLng> = mutableListOf()
+
     private lateinit var mMap: GoogleMap
     lateinit var parkingSitesList: List<ParkingSite>
     lateinit var presenter: ParkingContract.Presenter
+    internal var markerPoints = ArrayList<LatLng>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +49,44 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, ParkingContract.Vi
 
 
     }
+
+
+//        var polylineOptions =
+//                PolylineOptions().color(Color.RED).width(5f).add(startingLocatin).add(endingLocatin)
+//        mMap.clear()
+//        mMap.addPolyline(polylineOptions)
+
+//        utils.getDataFromAPI(Handler {
+//
+//            if (it.what == 1) {
+//                var location: LatLng
+//
+//                for (parking in parkingList){
+//                    location = LatLng(parking.location?.latitude!!, parking.location?.longitude!!)
+//                    mMap.addMarker(MarkerOptions().position(location).title(parking.title))
+//                }
+//            }
+//
+//            true
+//        })
+//        utils.getDataFromAPI(Handler {
+//
+//            if (it.what == 1) {
+//
+//                var location: LatLng = startingLocatin
+//                parkingList = utils.parkingSiteList
+//                for (parking in parkingList){
+//                    location = LatLng(parking.location?.latitude!!, parking.location?.longitude!!)
+//                    parkingLocations.add(location)
+//
+//                }
+//                var polylineOptions =
+//                        PolylineOptions().color(Color.RED).width(5f).add(location)
+//                googleMap.addPolyline(polylineOptions)
+//            }
+//
+//            true
+//        })
 
     override fun showList(list: List<ParkingSite>) {
         parkingSitesList = list
