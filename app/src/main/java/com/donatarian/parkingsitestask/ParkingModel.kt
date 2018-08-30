@@ -1,4 +1,5 @@
 package com.donatarian.parkingsitestask
 
-class ParkingModel {
+class ParkingModel: ParkingContract.Model {
+
 }

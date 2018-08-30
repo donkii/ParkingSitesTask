@@ -12,7 +12,8 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        appComponent = DaggerAppComponent.builder().utilsModule(UtilsModule(applicationContext)).build()
+        appComponent = DaggerAppComponent.builder().utilsModule(UtilsModule(applicationContext))
+                .build()
     }
 
     companion object {

@@ -10,7 +10,6 @@ import com.donatarian.parkingsitestask.retrofit.RetrofitClientInterface
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.logging.Handler
 
 
 class Utils(var context: Context) {
@@ -24,15 +23,10 @@ class Utils(var context: Context) {
       val URL = "http://192.168.0.121:88" //localhost IP Address.
 
 
+
     fun initializeList(list: List<ParkingSite>?) {
         parkingSiteList = list?.toMutableList() ?: mutableListOf()
-
-        Log.d("", "")
     }
-
-//    fun getList(): List<ParkingSite> {
-//        return parkingSiteList
-//    }
 
     fun getDataFromAPI(handler: android.os.Handler) {
         retrofitClientInterface = RetrofitCaller().createService()
@@ -58,20 +52,4 @@ class Utils(var context: Context) {
     }
 
 
-//    // Creating the Singleton Instance
-//    companion object {
-//
-//        private var instance: Utils? = null
-//        @Synchronized
-//        private fun createInstance() {
-//            if (instance == null) {
-//                instance = Utils()
-//            }
-//        }
-//
-//        fun getInstance(): Utils? {
-//            if (instance == null) createInstance()
-//            return instance
-//        }
-//    }
 }

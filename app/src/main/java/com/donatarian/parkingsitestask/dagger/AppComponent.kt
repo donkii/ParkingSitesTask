@@ -1,6 +1,7 @@
 package com.donatarian.parkingsitestask.dagger
 
 import com.donatarian.parkingsitestask.MapsActivity
+import com.donatarian.parkingsitestask.ParkingPresenter
 import dagger.Component
 import javax.inject.Singleton
 
@@ -8,4 +9,5 @@ import javax.inject.Singleton
 @Component(modules = [UtilsModule::class])
 interface AppComponent {
    fun inject(mapsActivity: MapsActivity)
+   fun inject(parkingPresenter: ParkingPresenter)
 }
