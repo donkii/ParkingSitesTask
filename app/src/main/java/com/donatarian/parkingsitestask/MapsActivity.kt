@@ -39,6 +39,7 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
     lateinit var parkingSitesList: List<ParkingSite>
     lateinit var presenter: ParkingContract.Presenter
     internal var markerPoints = ArrayList<LatLng>()
+    lateinit var URL: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,8 +62,8 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
             val location3 = LatLng(13.029727,77.5933021)
             googleMap.addMarker(MarkerOptions().position(location3).title("Bangalore"))
 
-            val URL = getDirectionURL(location1,location3)
-            GetDirection(URL).execute()
+            val URL = presenter.getDirectionUrl(location1,location3)
+            presenter.executeTask(URL)
 
         }
 
@@ -70,83 +71,86 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
         presenter.loadList()
     }
 
-    fun getDirectionURL(origin:LatLng,dest:LatLng) : String{
-        return "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${dest.latitude},${dest.longitude}&sensor=false&mode=driving"
-    }
-
-    private inner class GetDirection(val url : String) : AsyncTask<Void, Void, List<List<LatLng>>>(){
-        override fun doInBackground(vararg params: Void?): List<List<LatLng>> {
-            val client = OkHttpClient()
-            val request = Request.Builder().url(url).build()
-            val response = client.newCall(request).execute()
-            val data = response.body()!!.string()
-            Log.d("GoogleMap" , " data : $data")
-            val result =  ArrayList<List<LatLng>>()
-            try{
-                val respObj = Gson().fromJson(data, GoogleMapDTO::class.java)
-
-                val path =  ArrayList<LatLng>()
-
-                for (i in 0..(respObj.routes[0].legs[0].steps.size-1)){
-                    path.addAll(decodePolyline(respObj.routes[0].legs[0].steps[i].polyline.points))
-                }
-                result.add(path)
-            }catch (e:Exception){
-                e.printStackTrace()
-            }
-            return result
-        }
-
-        override fun onPostExecute(result: List<List<LatLng>>) {
-            val lineoption = PolylineOptions()
-            for (i in result.indices){
-                lineoption.addAll(result[i])
-                lineoption.width(10f)
-                lineoption.color(Color.BLUE)
-                lineoption.geodesic(true)
-            }
-            googleMap.addPolyline(lineoption)
-        }
-    }
-
-    fun decodePolyline(encoded: String): List<LatLng> {
-
-        val poly = ArrayList<LatLng>()
-        var index = 0
-        val len = encoded.length
-        var lat = 0
-        var lng = 0
-
-        while (index < len) {
-            var b: Int
-            var shift = 0
-            var result = 0
-            do {
-                b = encoded[index++].toInt() - 63
-                result = result or (b and 0x1f shl shift)
-                shift += 5
-            } while (b >= 0x20)
-            val dlat = if (result and 1 != 0) (result shr 1).inv() else result shr 1
-            lat += dlat
-
-            shift = 0
-            result = 0
-            do {
-                b = encoded[index++].toInt() - 63
-                result = result or (b and 0x1f shl shift)
-                shift += 5
-            } while (b >= 0x20)
-            val dlng = if (result and 1 != 0) (result shr 1).inv() else result shr 1
-            lng += dlng
-
-            val latLng = LatLng((lat.toDouble() / 1E5),(lng.toDouble() / 1E5))
-            poly.add(latLng)
-        }
-
-        return poly
+    override fun getPolyline(lineoption: PolylineOptions) {
+        googleMap.addPolyline(lineoption)
     }
 
 
+//region cde
+//    private inner class GetDirection(val url : String) : AsyncTask<Void, Void, List<List<LatLng>>>(){
+//        override fun doInBackground(vararg params: Void?): List<List<LatLng>> {
+//            val client = OkHttpClient()
+//            val request = Request.Builder().url(url).build()
+//            val response = client.newCall(request).execute()
+//            val data = response.body()!!.string()
+//            Log.d("GoogleMap" , " data : $data")
+//            val result =  ArrayList<List<LatLng>>()
+//            try{
+//                val respObj = Gson().fromJson(data, GoogleMapDTO::class.java)
+//
+//                val path =  ArrayList<LatLng>()
+//
+//                for (i in 0..(respObj.routes[0].legs[0].steps.size-1)){
+//                    path.addAll(decodePolyline(respObj.routes[0].legs[0].steps[i].polyline.points))
+//                }
+//                result.add(path)
+//            }catch (e:Exception){
+//                e.printStackTrace()
+//            }
+//            return result
+//        }
+//
+//        override fun onPostExecute(result: List<List<LatLng>>) {
+//            val lineoption = PolylineOptions()
+//            for (i in result.indices){
+//                lineoption.addAll(result[i])
+//                lineoption.width(10f)
+//                lineoption.color(Color.BLUE)
+//                lineoption.geodesic(true)
+//            }
+//            googleMap.addPolyline(lineoption)
+//        }
+//    }
+//
+//    fun decodePolyline(encoded: String): List<LatLng> {
+//
+//        val poly = ArrayList<LatLng>()
+//        var index = 0
+//        val len = encoded.length
+//        var lat = 0
+//        var lng = 0
+//
+//        while (index < len) {
+//            var b: Int
+//            var shift = 0
+//            var result = 0
+//            do {
+//                b = encoded[index++].toInt() - 63
+//                result = result or (b and 0x1f shl shift)
+//                shift += 5
+//            } while (b >= 0x20)
+//            val dlat = if (result and 1 != 0) (result shr 1).inv() else result shr 1
+//            lat += dlat
+//
+//            shift = 0
+//            result = 0
+//            do {
+//                b = encoded[index++].toInt() - 63
+//                result = result or (b and 0x1f shl shift)
+//                shift += 5
+//            } while (b >= 0x20)
+//            val dlng = if (result and 1 != 0) (result shr 1).inv() else result shr 1
+//            lng += dlng
+//
+//            val latLng = LatLng((lat.toDouble() / 1E5),(lng.toDouble() / 1E5))
+//            poly.add(latLng)
+//        }
+//
+//        return poly
+//    }
+//endregion.
+
+//region abc.
 //        var polylineOptions =
 //                PolylineOptions().color(Color.RED).width(5f).add(startingLocatin).add(endingLocatin)
 //        mMap.clear()
@@ -183,19 +187,14 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
 //
 //            true
 //        })
+//endregion.
 
     override fun showList(list: List<ParkingSite>) {
         parkingSitesList = list
-
-        var park: ParkingSite = parkingSitesList.get(0)
-        var location: LatLng = LatLng(park.location?.latitude!!, park.location?.longitude!!)
-        val zoomLevel = 15.0f
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, zoomLevel))
-
+        var location: LatLng
         for (parking in parkingSitesList){
             location = LatLng(parking.location?.latitude!!, parking.location?.longitude!!)
-            mMap.addMarker(MarkerOptions().position(location).title(parking.title))
+            googleMap.addMarker(MarkerOptions().position(location).title(parking.title))
         }
     }
 }
