@@ -71,7 +71,6 @@ class ParkingPresenter(var view: ParkingContract.View) : ParkingContract.Present
                 lineoption.color(Color.BLUE)
                 lineoption.geodesic(true)
             }
-//            googleMap.addPolyline(lineoption)
             view.getPolyline(lineoption)
         }
     }

@@ -1,29 +1,30 @@
 package com.donatarian.parkingsitestask
 
-import android.graphics.Color
+import android.content.Context
 import android.location.Address
 import android.location.Geocoder
-import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
 import com.donatarian.parkingsitestask.Models.ParkingSite
 import com.donatarian.parkingsitestask.Singleton.Utils
-import com.donatarian.parkingsitestask.map.GoogleMapDTO
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.PolylineOptions
-import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_maps.*
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import java.io.IOException
 import javax.inject.Inject
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.support.v4.content.ContextCompat
+import android.support.annotation.DrawableRes
+import com.google.android.gms.maps.model.BitmapDescriptor
+
+
 
 class MapsActivity : AppCompatActivity(), ParkingContract.View {
 
@@ -40,6 +41,7 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
     private lateinit var parkingList: MutableList<ParkingSite>
     private var parkingLocations: MutableList<LatLng> = mutableListOf()
     lateinit var URL: String
+    lateinit var lineOption: PolylineOptions
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +64,7 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
     }
 
     override fun getPolyline(lineoption: PolylineOptions) {
+        lineOption = lineoption
         googleMap.addPolyline(lineoption)
     }
 
@@ -182,15 +185,16 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
     override fun showList(list: List<ParkingSite>) {
         parkingSitesList = list
         var location: LatLng
-        for (parking in parkingSitesList){
-            location = LatLng(parking.location?.latitude!!, parking.location?.longitude!!)
-            googleMap.addMarker(MarkerOptions().position(location).title(parking.title))
-        }
+//        for (parking in parkingSitesList){
+//            location = LatLng(parking.location?.latitude!!, parking.location?.longitude!!)
+//            googleMap.addMarker(MarkerOptions().position(location).title(parking.title)
+//                    .icon(bitmapDescriptorFromVector(this, R.drawable.ic_parking_site )))
+//        }
     }
 
     fun showRoute(){
-        val originLocation = getLocationFromAddress(txtDestination.text.toString())
-        val destinationLocation = getLocationFromAddress(txtOrigin.text.toString())
+        val originLocation = getLocationFromAddress(txtOrigin.text.toString())
+        val destinationLocation = getLocationFromAddress(txtDestination.text.toString())
 
         if (originLocation == LatLng(0.0, 0.0) || destinationLocation == LatLng(0.0, 0.0)){
         }else {
@@ -201,6 +205,17 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
 
             val URL = presenter.getDirectionUrl(originLocation, destinationLocation)
             presenter.executeTask(URL)
+        }
+        for (parking in parkingSitesList) {
+            var i = 0
+            var location: LatLng
+            if (distanceInMeters(parking.location!!.latitude!!, parking.location!!.longitude!!,
+                        lineOption.points[i].latitude, lineOption.points[i].longitude  ) < 100){
+                location = LatLng(parking.location?.latitude!!, parking.location?.longitude!!)
+                googleMap.addMarker(MarkerOptions().position(location).title(parking.title)
+                        .icon(bitmapDescriptorFromVector(this, R.drawable.ic_parking_site )))
+                i++
+            }
         }
     }
 
@@ -230,5 +245,32 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
 
         }
         return point
+    }
+
+    private fun bitmapDescriptorFromVector
+            (context: Context, @DrawableRes vectorDrawableResourceId: Int): BitmapDescriptor {
+        val background = ContextCompat.getDrawable(context, vectorDrawableResourceId)
+        background!!.setBounds(0, 0, background.intrinsicWidth, background.intrinsicHeight)
+        val vectorDrawable = ContextCompat.getDrawable(context, vectorDrawableResourceId)
+        vectorDrawable!!.setBounds(0, 0, vectorDrawable.intrinsicWidth,
+                vectorDrawable.intrinsicHeight)
+        val bitmap =
+                Bitmap.createBitmap(background.intrinsicWidth, background.intrinsicHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        background.draw(canvas)
+        vectorDrawable.draw(canvas)
+        return BitmapDescriptorFactory.fromBitmap(bitmap)
+    }
+
+    fun distanceInMeters(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double{
+        val R = 6378.137
+        val dLat = lat2 * Math.PI / 180 - lat1 * Math.PI / 180
+        val dLon = lon2 * Math.PI / 180 - lon1 * Math.PI / 180
+        val a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2)
+        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+        val d = R * c
+        return d * 1000 // meters
     }
 }
