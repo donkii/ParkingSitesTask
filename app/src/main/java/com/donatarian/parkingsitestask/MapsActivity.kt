@@ -31,6 +31,9 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
     lateinit var destinationLocation: LatLng
     var distance: Double = 0.0
     lateinit var parkingIcon: BitmapDescriptor
+    val SEARCH_INTERVAL = 50
+    val SEARCH_DISTANCE = 100
+    val INITIAL_LOCATION = LatLng(48.210033, 16.363449)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,8 +42,7 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
         mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync {
             googleMap = it
-            val initialLocation = LatLng(48.210033, 16.363449)
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(initialLocation, 15f))
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(INITIAL_LOCATION, 15f))
         }
 
         parkingIcon = Functions.bitmapDescriptorFromVector(applicationContext,
@@ -101,7 +103,7 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
     fun showParkingSites() {
         doAsync {
             val searchIncrement = Functions.parkingSearchInterval(distance,
-                    lineOption.points.size, 25)
+                    lineOption.points.size, SEARCH_INTERVAL)
 
             for (parking in parkingSitesList) {
                 var point = 0
@@ -109,7 +111,7 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
                 var distanceBetweenParkingAndPoint: Double
                 while (point < lineOption.points.size) {
                     distanceBetweenParkingAndPoint = SphericalUtil.computeDistanceBetween(parkingLatLng, lineOption.points[point])
-                    if (distanceBetweenParkingAndPoint < 100) {
+                    if (distanceBetweenParkingAndPoint < SEARCH_DISTANCE) {
                         uiThread {
                             googleMap.addMarker(MarkerOptions().position(parkingLatLng).title(parking.title)
                                     .icon(parkingIcon))
