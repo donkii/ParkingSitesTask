@@ -42,6 +42,9 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
     private var parkingLocations: MutableList<LatLng> = mutableListOf()
     lateinit var URL: String
     lateinit var lineOption: PolylineOptions
+    lateinit var originLocation: LatLng
+    lateinit var destinationLocation: LatLng
+    var distance: Double = 0.0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +69,7 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
     override fun getPolyline(lineoption: PolylineOptions) {
         lineOption = lineoption
         googleMap.addPolyline(lineoption)
+        showParkingSites()
     }
 
 
@@ -193,8 +197,11 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
     }
 
     fun showRoute(){
-        val originLocation = getLocationFromAddress(txtOrigin.text.toString())
-        val destinationLocation = getLocationFromAddress(txtDestination.text.toString())
+        originLocation = getLocationFromAddress(txtOrigin.text.toString())
+        destinationLocation = getLocationFromAddress(txtDestination.text.toString())
+
+        distance = distanceInMeters(originLocation.latitude, originLocation.longitude,
+                destinationLocation.latitude, destinationLocation.longitude)
 
         if (originLocation == LatLng(0.0, 0.0) || destinationLocation == LatLng(0.0, 0.0)){
         }else {
@@ -206,17 +213,26 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
             val URL = presenter.getDirectionUrl(originLocation, destinationLocation)
             presenter.executeTask(URL)
         }
-        for (parking in parkingSitesList) {
-            var i = 0
-            var location: LatLng
-            if (distanceInMeters(parking.location!!.latitude!!, parking.location!!.longitude!!,
-                        lineOption.points[i].latitude, lineOption.points[i].longitude  ) < 100){
-                location = LatLng(parking.location?.latitude!!, parking.location?.longitude!!)
-                googleMap.addMarker(MarkerOptions().position(location).title(parking.title)
-                        .icon(bitmapDescriptorFromVector(this, R.drawable.ic_parking_site )))
-                i++
+    }
+
+    fun showParkingSites() {
+        var x = distance / lineOption.points.size
+        var y = 50/x
+        var z = y.toInt()
+
+            for (parking in parkingSitesList) {
+                var i = 0
+                while (i < lineOption.points.size) {
+                    var location: LatLng
+                    if (distanceInMeters(parking.location!!.latitude!!, parking.location!!.longitude!!,
+                                    lineOption.points[i].latitude, lineOption.points[i].longitude) < 100) {
+                        location = LatLng(parking.location?.latitude!!, parking.location?.longitude!!)
+                        googleMap.addMarker(MarkerOptions().position(location).title(parking.title)
+                                .icon(bitmapDescriptorFromVector(this, R.drawable.ic_parking_site)))
+                    }
+                    i += z
+                }
             }
-        }
     }
 
     fun getLocationFromAddress(strAddress: String): LatLng {
