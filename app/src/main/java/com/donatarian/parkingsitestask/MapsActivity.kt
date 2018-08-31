@@ -23,7 +23,8 @@ import android.graphics.Canvas
 import android.support.v4.content.ContextCompat
 import android.support.annotation.DrawableRes
 import com.google.android.gms.maps.model.BitmapDescriptor
-
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.uiThread
 
 
 class MapsActivity : AppCompatActivity(), ParkingContract.View {
@@ -63,6 +64,7 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
 
         btnSearch.setOnClickListener {
             showRoute()
+
         }
     }
 
@@ -189,11 +191,11 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
     override fun showList(list: List<ParkingSite>) {
         parkingSitesList = list
         var location: LatLng
-//        for (parking in parkingSitesList){
-//            location = LatLng(parking.location?.latitude!!, parking.location?.longitude!!)
-//            googleMap.addMarker(MarkerOptions().position(location).title(parking.title)
-//                    .icon(bitmapDescriptorFromVector(this, R.drawable.ic_parking_site )))
-//        }
+        for (parking in parkingSitesList){
+            location = LatLng(parking.location?.latitude!!, parking.location?.longitude!!)
+            googleMap.addMarker(MarkerOptions().position(location).title(parking.title)
+                    .icon(bitmapDescriptorFromVector(this, R.drawable.ic_parking_site )))
+        }
     }
 
     fun showRoute(){
@@ -206,8 +208,10 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
         if (originLocation == LatLng(0.0, 0.0) || destinationLocation == LatLng(0.0, 0.0)){
         }else {
             googleMap.clear()
-            googleMap.addMarker(MarkerOptions().position(originLocation).title(txtDestination.text.toString()))
-            googleMap.addMarker(MarkerOptions().position(destinationLocation).title(txtOrigin.text.toString()))
+            googleMap.addMarker(MarkerOptions().position(originLocation)
+                    .title(txtDestination.text.toString()))
+            googleMap.addMarker(MarkerOptions().position(destinationLocation)
+                    .title(txtOrigin.text.toString()))
             googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(originLocation, 12f))
 
             val URL = presenter.getDirectionUrl(originLocation, destinationLocation)
@@ -216,9 +220,10 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
     }
 
     fun showParkingSites() {
-        var x = distance / lineOption.points.size
-        var y = 50/x
-        var z = y.toInt()
+        doAsync {
+            var x = distance / lineOption.points.size
+            var y = 50/x
+            var z = y.toInt()
 
             for (parking in parkingSitesList) {
                 var i = 0
@@ -227,12 +232,16 @@ class MapsActivity : AppCompatActivity(), ParkingContract.View {
                     if (distanceInMeters(parking.location!!.latitude!!, parking.location!!.longitude!!,
                                     lineOption.points[i].latitude, lineOption.points[i].longitude) < 100) {
                         location = LatLng(parking.location?.latitude!!, parking.location?.longitude!!)
-                        googleMap.addMarker(MarkerOptions().position(location).title(parking.title)
-                                .icon(bitmapDescriptorFromVector(this, R.drawable.ic_parking_site)))
+                        uiThread {
+                            googleMap.addMarker(MarkerOptions().position(location).title(parking.title)
+                                    .icon(bitmapDescriptorFromVector(applicationContext, R.drawable.ic_parking_site)))
+                        }
+
                     }
                     i += z
                 }
             }
+        }
     }
 
     fun getLocationFromAddress(strAddress: String): LatLng {
