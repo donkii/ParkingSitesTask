@@ -1,9 +1,8 @@
 package com.donatarian.parkingsitestask.retrofit
 
-import com.donatarian.parkingsitestask.Models.ParkingSiteEngine
+import com.donatarian.parkingsitestask.models.ParkingSiteEngine
 import retrofit2.Call
 import retrofit2.http.GET
-import retrofit2.http.Query
 
 interface RetrofitClientInterface {
 

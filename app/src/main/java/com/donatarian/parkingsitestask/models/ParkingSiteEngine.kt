@@ -1,4 +1,4 @@
-package com.donatarian.parkingsitestask.Models
+package com.donatarian.parkingsitestask.models
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName

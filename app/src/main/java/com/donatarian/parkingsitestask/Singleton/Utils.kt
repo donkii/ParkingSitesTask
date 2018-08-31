@@ -1,12 +1,12 @@
 package com.donatarian.parkingsitestask.Singleton
 
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
-import com.donatarian.parkingsitestask.Models.ParkingSite
-import com.donatarian.parkingsitestask.Models.ParkingSiteEngine
+import com.donatarian.parkingsitestask.models.ParkingSite
+import com.donatarian.parkingsitestask.models.ParkingSiteEngine
 import com.donatarian.parkingsitestask.retrofit.RetrofitCaller
 import com.donatarian.parkingsitestask.retrofit.RetrofitClientInterface
+import com.google.android.gms.maps.model.LatLng
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -19,10 +19,10 @@ class Utils(var context: Context) {
     // List to hold the data from JSON File.
     var parkingSiteList: MutableList<ParkingSite> = mutableListOf()
 
-    // URL for Retrofit Call
-      val URL = "http://192.168.0.121:88" //localhost IP Address.
-
-
+    companion object {
+        // URL for Retrofit Call
+        val URL = "http://192.168.0.121:88" //localhost IP Address.
+    }
 
     fun initializeList(list: List<ParkingSite>?) {
         parkingSiteList = list?.toMutableList() ?: mutableListOf()

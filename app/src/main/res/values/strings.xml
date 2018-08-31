@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">ParkingSitesTask</string>
     <string name="title_activity_maps">Map</string>
+    <string name="address_not_found">Address not found!</string>
+    <string name="origin">Origin</string>
+    <string name="destination">Destination</string>
+    <string name="search">Search</string>
 </resources>

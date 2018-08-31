@@ -1,7 +1,7 @@
 package com.donatarian.parkingsitestask.dagger
 
 import com.donatarian.parkingsitestask.MapsActivity
-import com.donatarian.parkingsitestask.ParkingPresenter
+import com.donatarian.parkingsitestask.presenters.ParkingPresenter
 import dagger.Component
 import javax.inject.Singleton
 
